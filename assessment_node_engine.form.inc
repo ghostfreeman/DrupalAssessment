@@ -2,21 +2,28 @@
 /**
  * Implements the form to create and edit the custom articles.
  */
-function assessment_node_engine_form($form, &$form_state) {
-  global $user;
+function assessment_node_engine_form($form, &$form_state, $article_id=NULL) {
   $form = array();
-  //$defaults =
+
+  if(!(is_null($article_id))) {
+    $defaults = assessment_node_engine_find_existing($article_id);
+  }
 
   $form['title'] = array(
     '#type' => 'textfield',
-    //'#default_value' =>
-    '#description' => t('Title'),
+    "#title" => t("Title"),
+    '#default_value' => (isset($defaults->title) ? $defaults->title : ""),
   );
 
   $form['bodytext'] = array(
     '#type' => 'textarea',
     "#title" => t("Body"),
-    //"#default_value" =>
+    "#default_value" => (isset($defaults->bodytext) ? $defaults->bodytext : ""),
+  );
+
+  $form['article_id'] = array(
+    '#type' => 'hidden',
+    "#default_value" => (isset($defaults->article_id) ? $defaults->article_id : ""),
   );
 
   $form['actions'] = array(
@@ -47,7 +54,14 @@ function assessment_node_engine_form_validate($form, &$form_state) {
  */
 function assessment_node_engine_form_submit($form, &$form_state) {
   global $user;
-  dpm($form, "Form");
-  $save_status = assessment_node_engine_save_article($user->uid, $form['title']['#value'], $form['bodytext']['#value']);
+
+  if ($form['article_id']['#value'] != "") {
+    //Editing existing article
+    $save_status = assessment_node_engine_save_article($user->uid, $form['title']['#value'], $form['bodytext']['#value'], NULL, NULL, $form['article_id']['#value']);
+  } else {
+    //saving new article
+    $save_status = assessment_node_engine_save_article($user->uid, $form['title']['#value'], $form['bodytext']['#value']);
+  }
+
   drupal_set_message(t("Your article has been created"));
 }

@@ -22,6 +22,16 @@ function assessment_node_engine_menu() {
     'access arguments' => array("view content"),
   );
 
+  $items['my-node-system/%/edit'] = array(
+    'title' => t("Edit Article"),
+    'type' => MENU_LOCAL_TASK,
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('assessment_node_engine_form', 1),
+    'file' => 'assessment_node_engine.form.inc',
+    'access callback' => 'assessment_node_engine_confirm_access',
+    'access arguments' => array("create", $GLOBALS['user']),
+  );
+
   return $items;
 }
 
@@ -79,7 +89,7 @@ function assessment_node_engine_confirm_access($op, $account) {
  */
 function assessment_node_engine_save_article($user_id, $title, $bodytext, $created=NULL, $changed=NULL, $article_id=NULL) {
   //Check if record exists
-  if(!(is_null(article_id))) {
+  if(!(is_null($article_id))) {
     $result = assessment_node_engine_find_existing($article_id);
   }
 
