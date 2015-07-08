@@ -9,7 +9,6 @@ function assessment_node_engine_form($form, &$form_state) {
 
   $form['title'] = array(
     '#type' => 'textfield',
-    '#title' => t('Title'),
     //'#default_value' =>
     '#description' => t('Title'),
   );
@@ -29,7 +28,7 @@ function assessment_node_engine_form($form, &$form_state) {
     "#value" => t('Save'),
   );
 
-  $form['#submit'] = array();
+  $form['#submit'] = array('assessment_node_engine_form_submit');
 
   return $form;
 }
@@ -38,7 +37,7 @@ function assessment_node_engine_form($form, &$form_state) {
  * This is a validation function scaffold for the above form. Since its a
  * scaffold, nothing is used.
  */
-function assessment_node_engine_form($form, &$form_state) {
+function assessment_node_engine_form_validate($form, &$form_state) {
 
 }
 
@@ -48,24 +47,7 @@ function assessment_node_engine_form($form, &$form_state) {
  */
 function assessment_node_engine_form_submit($form, &$form_state) {
   global $user;
-  //$save_status = twc_block_demo_form_save_message($user->uid, $form_state['values']['message']);
+  dpm($form, "Form");
+  $save_status = assessment_node_engine_save_article($user->uid, $form['title']['#value'], $form['bodytext']['#value']);
   drupal_set_message(t("Your article has been created"));
-}
-
-/**
- * Look up the database for any existing field entries. If they exist, send them
- * back.
- */
-function assessment_node_engine_form_submit($user_id) {
-  $results = db_query("SELECT message FROM {login_messages} WHERE user_id = :n_user_id", array(":n_user_id" => $user_id));
-
-  foreach ($results as $result) {
-    $message = $result->message;
-  }
-
-  if(isset($message)) {
-    return $message;
-  } else {
-    return null;
-  }
 }

@@ -8,13 +8,19 @@ function assessment_node_engine_menu() {
     'title' => t("Add new Article"),
     'type' => MENU_LOCAL_TASK,
     'page callback' => 'drupal_get_form',
+    'page arguments' => array('assessment_node_engine_form'),
     'file' => 'assessment_node_engine.form.inc',
     'access callback' => 'assessment_node_engine_confirm_access',
     'access arguments' => array("create", $GLOBALS['user']),
   );
 
-  /* $items['my-node-system/%'] = array(
-  ); */
+  $items['my-node-system/%'] = array(
+    'title' => t("Article"),
+    'type' => MENU_LOCAL_TASK,
+    'page callback' => 'assessment_node_engine_get_article',
+    'page arguments' => array(1),
+    'access arguments' => array("view content"),
+  );
 
   return $items;
 }
@@ -37,6 +43,25 @@ function assessment_node_engine_theme($existing, $type, $theme, $path) {
 }
 
 /**
+ * Returns article based on article ID
+ */
+function assessment_node_engine_get_article($article_id) {
+  $article = assessment_node_engine_find_existing($article_id);
+
+  if(!(is_null($article))) {
+
+    $attributes = array(
+      "created" => $article->created,
+      "changed" => $article->changed,
+      "title" => $article->title,
+      "bodytext" => $article->bodytext,
+    );
+
+    return theme("article", $attributes);
+  }
+}
+
+/**
  * Confirms the user has access to the feature. This could be implemented using
  * the 'access arguments' setting but I was not clear on if we needed to
  * reimplement.
@@ -52,3 +77,51 @@ function assessment_node_engine_confirm_access($op, $account) {
 /**
  * Creates a new article item
  */
+function assessment_node_engine_save_article($user_id, $title, $bodytext, $created=NULL, $changed=NULL, $article_id=NULL) {
+  //Check if record exists
+  if(!(is_null(article_id))) {
+    $result = assessment_node_engine_find_existing($article_id);
+  }
+
+  if(sizeof($result) > 0) {
+    //Existing record
+    $result = db_update('new_article')
+      ->fields(array(
+          'title' => $title,
+          'bodytext' => $bodytext,
+          'changed' => date('U'),
+        )
+      )
+      ->condition('article_id', $article_id, '=')
+      ->execute();
+  } else {
+    $result = db_insert('new_article')
+    ->fields(array(
+        'title' => $title,
+        'bodytext' => $bodytext,
+        'created' => date('U'),
+        'changed' => date('U'),
+      )
+    )
+    ->execute();
+  }
+
+  return $result;
+}
+
+/**
+ * Loads an existing article item based on article ID
+ */
+function assessment_node_engine_find_existing($article_id) {
+  $results = db_query("SELECT * FROM {new_article} WHERE article_id = :n_article_id", array(":n_article_id" => $article_id));
+
+  foreach($results as $result) {
+    $article = $result;
+  }
+
+  if(isset($article)) {
+    return $article;
+  } else {
+    return null;
+  }
+}
