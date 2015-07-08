@@ -58,11 +58,11 @@ function assessment_node_engine_form_submit($form, &$form_state) {
   if ($form['article_id']['#value'] != "") {
     //Editing existing article
     $save_status = assessment_node_engine_save_article($user->uid, $form['title']['#value'], $form['bodytext']['#value'], NULL, NULL, $form['article_id']['#value']);
-      drupal_set_message(t("Your article has been revised"));
+    drupal_set_message(t("Your article has been revised"));
   } else {
     //saving new article
     $save_status = assessment_node_engine_save_article($user->uid, $form['title']['#value'], $form['bodytext']['#value']);
-      drupal_set_message(t("Your article has been created"));
+    drupal_set_message(t("Your article has been created"));
   }
 
   drupal_goto("my-node-system/".$form['article_id']['#value']);
