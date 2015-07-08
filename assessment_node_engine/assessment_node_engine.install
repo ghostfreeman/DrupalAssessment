@@ -1,0 +1,45 @@
+<?php
+
+/**
+ * Implements hook_schema()
+ */
+function assessment_node_engine_schema() {
+  $schema['new_article'] = array(
+    'description' => t("Base table for new articles"),
+    'fields' => array(
+      'article_id' => array(
+        'description' => t('Primary ID'),
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'title' => array(
+        'description' => t("Description"),
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'bodytext' => array(
+        'description' => t('Body text of the article'),
+        'type' => 'text',
+        'not null' => FALSE,
+      ),
+      'created' => array(
+        'description' => t('Date Created (unix)'),
+        'type' => 'int',
+      ),
+      'changed' => array(
+        'description' => t('Date Changed (unix)'),
+        'type' => 'int',
+      ),
+    ),
+    'indexes' => array(
+      'new_article_created' => array('created'),
+      'new_article_changed' => array('changed'),
+    ),
+    'primary key' => array('article_id'),
+  );
+
+  return $schema;
+}
